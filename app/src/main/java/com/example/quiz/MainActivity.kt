@@ -1,5 +1,7 @@
 package com.example.quiz
 
+import android.graphics.Color
+import android.graphics.PorterDuff
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -25,6 +27,7 @@ class MainActivity : AppCompatActivity() {
 
         lateinit var quiz : Quiz
 
+
         val inputStream = resources.openRawResource(R.raw.questions)
         val jsonText = inputStream.bufferedReader().use {
             it.readText()
@@ -34,26 +37,29 @@ class MainActivity : AppCompatActivity() {
         val gson = Gson()
         val qType = object : TypeToken<List<Question>>() { }.type
         val questionList = gson.fromJson<List<Question>>(jsonText, qType)
-        Log.d(TAG, "onCreate: ${questionList.toString()}")
+        Log.d(TAG, "onCreate: \n${questionList.toString()}")
 
-        questions = List<Question>
+        quiz = Quiz(questionList)
 
-        val jsonArray = JSONArray(jsonText)
-        for(question:JSONObject in jsonArray){
-            val questionText = question.get("question")
-            val questionAnswer = question.get("answer")
-            val question = Question(questionText, questionAnswer)
-            questions.add(question)
+        questionText.text = "Click to begin"
+        trueButton.text = "True"
+        falseButton.text = "False"
+
+        trueButton.setOnClickListener {
+            if(quiz.check(true)){
+
+            }
+            questionText.text = quiz.nextQuestion()
+
         }
+        falseButton.setOnClickListener {
+            if(quiz.check(false)){
 
-        quiz = Quiz(questions)
+            }
+        }
     }
 
     data class Question(var q: String, var answer: Boolean){
-
-    }
-
-    data class Quiz(val questions: List<Question>){
 
     }
 
