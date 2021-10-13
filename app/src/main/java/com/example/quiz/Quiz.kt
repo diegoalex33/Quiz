@@ -1,29 +1,33 @@
 package com.example.quiz
 
+import android.view.View
+
 class Quiz (val questions: List<MainActivity.Question>) {
     val numQuestions = questions.size
     var score = 0
-    var questionNum = 0
+    var questionNum = -1
 
-    fun nextQuestion(): String{
+
+    fun nextQuestion() {
         questionNum++
-        if(questionNum==questions.size){
-            reset()
+        if (questionNum != questions.size) {
+            questionText.text = "" + questions.get(questionNum).question
         }
-        return questions.get(questionNum).q
     }
 
-    fun check(tf : Boolean): Boolean {
+    fun qRemaining(): Boolean{
+
+    }
+
+
+    fun check(tf: Boolean): Boolean {
         if (questions.get(questionNum).answer == tf) {
             score++
             return true
+        } else {
+            return false
         }
-        return false
     }
 
-    fun reset(){
-        score = 0
-
-    }
 
 }
