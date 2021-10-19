@@ -1,14 +1,16 @@
 package com.example.quiz
 
 import android.graphics.Color
-import android.graphics.Color.GREEN
-import android.graphics.Color.RED
+import android.graphics.Color.*
 import android.graphics.PorterDuff
+import android.media.Image
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.Button
+import android.widget.FrameLayout
+import android.widget.ImageView
 import android.widget.TextView
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -20,6 +22,10 @@ lateinit var trueButton: Button
 lateinit var falseButton: Button
 lateinit var scoreText : TextView
 lateinit var finalText : TextView
+lateinit var megadeth: ImageView
+lateinit var metallica : ImageView
+
+lateinit var quiz : Quiz
 val TAG = "MainActivity"
 
 
@@ -29,8 +35,6 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         wireWidgits()
-
-        lateinit var quiz: Quiz
 
         val inputStream = resources.openRawResource(R.raw.questions)
         val jsonText = inputStream.bufferedReader().use {
@@ -44,50 +48,58 @@ class MainActivity : AppCompatActivity() {
         Log.d(TAG, "onCreate: \n${questions.toString()}")
 
         finalText.visibility = View.GONE
-
+        metallica.visibility = View.GONE
         quiz = Quiz(questions)
 
-        quiz.nextQuestion()
+        updateQuestion()
 
 
         trueButton.setOnClickListener {
-            if(quiz.check(true)){
-                trueButton.setBackgroundColor(GREEN)
-                falseButton.setBackgroundColor(GREEN)
-            }
-            else{
-                trueButton.setBackgroundColor(RED)
-                falseButton.setBackgroundColor(RED)
-            }
-            scoreText.text = resources.getString(R.string.main_score) + ": " + quiz.score
-            quiz.nextQuestion()
+            display(quiz.check(true))
+            updateQuestion()
         }
+
         falseButton.setOnClickListener {
-            if(quiz.check(false)){
-                trueButton.setBackgroundColor(GREEN)
-                falseButton.setBackgroundColor(GREEN)            }
-            else{
-                trueButton.setBackgroundColor(RED)
-                falseButton.setBackgroundColor(RED)            }
-            scoreText.text = resources.getString(R.string.main_score) + ": " + quiz.score
-            quiz.nextQuestion()
+            display(quiz.check(false))
+            updateQuestion()
         }
 
     }
 
-    data class Question(var question: String, var answer: Boolean) {
+    fun display(bool: Boolean){
+        if(bool){
+            trueButton.setBackgroundColor(GREEN)
+            falseButton.setBackgroundColor(GREEN)
+        }
+        else{
+            trueButton.setBackgroundColor(RED)
+            falseButton.setBackgroundColor(RED)
+        }
+        scoreText.text = resources.getString(R.string.main_score) + ": " + quiz.score
+    }
 
+    fun updateQuestion(){
+        if(!quiz.qRemaining()){
+            endGame()
+        }
+        else{
+            quiz.nextQuestion()
+        }
     }
 
     fun endGame() {
         finalText.visibility = View.VISIBLE
-        finalText.text = resources.getString(R.string.main_score) + quiz.score
+        metallica.visibility = View.VISIBLE
+        finalText.text = resources.getString(R.string.main_message) + quiz.score
+        questionText.visibility = View.GONE
         falseButton.visibility = View.GONE
         trueButton.visibility = View.GONE
         scoreText.visibility = View.GONE
     }
 
     fun wireWidgits() {
+        metallica = findViewById(R.id.imageView_main_metallica)
+        megadeth = findViewById(R.id.imageView_main_megadeth)
         questionText = findViewById(R.id.textView_main_question)
         trueButton = findViewById(R.id.button_main_true)
         falseButton = findViewById(R.id.button_main_false)
